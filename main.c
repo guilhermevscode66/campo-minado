@@ -28,17 +28,10 @@ return t;
 //criando a função pra preencher o tabuleiro
 void preencher(tabuleiro* t)
 {
-    //for pra preencher as células com bombas
-for(int i = 0; i<t->linhas; i++){
-    for(int j=0; j<t->colunas; j++){
-        t->celulas[i][j] = -1;
-    }
-}
-
 //for pra preencher as células que não são bombas
 for(int i=0; i<t->linhas; i++){
     for(int j=0; j<t->colunas; j++){
-        t->celulas[i][j] =0;
+        t->celulas[i][j] = 0;
     }
 }
 
@@ -64,13 +57,13 @@ free(t);
     
 }
 //criando a função que coloca as bombas no lugar
-void coloca_bombas(tabuleiro* t )
+void coloca_bombas(tabuleiro* t, int nrbombas)
 {
-   
+   //recebe a quantidade de bombas do usuário, compara essa quantidade com um contador e coloca as bombas nas células
 int b=0; //contador de bombas pra ser incrementado
 
         
-        while(b < t->linhas*t->colunas)
+        while(b < nrbombas)
     {
     int l = rand() % t->linhas;
     int c = rand() % t->colunas;
@@ -82,13 +75,11 @@ int b=0; //contador de bombas pra ser incrementado
         l = rand() %t->linhas;
         c = rand() % t->colunas;
         }
-if(b == t->linhas*t->colunas){
-    break;
-}
 
 }
 
 }
+
 /** funções para colocar o terminal em raw mode e modo normal, são necessárias para fazer a navegaçãop com as setas*/
 
 void disable_raw_mode(struct termios *orig){
@@ -123,6 +114,7 @@ srand(time(NULL));
     int nrbombas ;
     int p=0; //posição de linha na matriz pra percorrer com as setas
     int pc = 0; //posição de colunas da matriz
+    int bombas_ao_redor=0; //o número de bombas que foram achadas ao redor de uma célula
     tabuleiro* t;
 struct termios orig_termios;
 
@@ -131,22 +123,20 @@ struct termios orig_termios;
 printf("Digite o número de colunas:\n");
 scanf("%d",&colunas);
 
-
-
 printf("Digitte o número de bombas:\n");
 scanf("%d",&nrbombas);
 
 //verifica se o número de bombas é maior que o número de células
 while(nrbombas > linhas*colunas){
-break;
-if(nrbombas > linhas*colunas)
 printf("O numero de bombas não pode ser maior que o numero de celulas. Atualmente voce possui %d celulas\n", linhas*colunas);
 fflush(stdin);
 printf("Digitte o número de bombas:\n");
+scanf("%d", &nrbombas);
 }
 
      t =alocar(linhas, colunas);
 preencher(t);
+coloca_bombas(t, nrbombas);
 imprimir(t);
 
 
@@ -204,8 +194,12 @@ printf("sequencia de escape não tratada: ESC[%c\r\n", seq[1]); break;
 if(t->celulas[p][pc] == -1){
     printf("Fim de jogo!"); exit(1);
 }else{
-    //se não só imprime o número da linha e coluna por enquanto, logica das diagonais depois
-    printf("%d%d", p, pc);
+//se tiver bomba ao redor conta quantas tem
+if(t->celulas[p+1][pc] ==-1){ bombas_ao_redor++;}
+if(t->celulas[p-1][pc] ==-1){bombas_ao_redor++;}
+if(t->celulas[p][pc+1] ==-1){bombas_ao_redor++;}
+if(t->celulas[p][pc-1] ==-1){bombas_ao_redor++;}
+printf("%d",bombas_ao_redor);
 }
 }
 
